@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+encoding//interfaces/piserial/__init__.py=utf-8
+encoding//pidevice/__init__.py=utf-8
+encoding//pidevice/gcs2/gcs2commands.py=utf-8
+encoding//pidevice/gcs2/gcs2pitools.py=utf-8
+encoding//pidevice/gcscommands.py=utf-8
+encoding//pidevice/gcsdevice.py=utf-8
+encoding//pidevice/gcsmessages.py=utf-8
+encoding//pidevice/interfaces/piserial.py=utf-8
+encoding//pitools/__init__.py=utf-8
+encoding//pitools/pitools.py=utf-8
+encoding/__init__.py=utf-8
