@@ -68,7 +68,7 @@ class PIStageNew(PIStage):
 
         self.settings.New(ax_name + '_servo', dtype=bool, ro=False)
 
-        self.settings.New(ax_name + "_velocity", dtype=float, vmin=0, vmax=200, ro=False, si=False, spinbox_decimals=3, unit='mm/s')
+        self.settings.New(ax_name + "_velocity", dtype=float, vmin=0, vmax=200, ro=False, si=False, spinbox_decimals=3, initial=100, unit='mm/s')
 
         self.settings.New(ax_name + "_on_target", dtype=bool, ro=True)
 
@@ -91,6 +91,12 @@ class PIStageNew(PIStage):
     def connect(self):
         
         super().connect()
+        
+        # if self.pidevice.HasCCL(): 
+        #     self.pidevice.CCL(level = 1, password='advanced')
+        
+        # if self.pidevice.HasSPA(): 
+        #     self.pidevice.SPA(items = 1, params = 0x06010300, values = 1)
         
         self.pidevice.MOV(1, self.settings.x_target.val)
         self.tablerate.hardware_read_func = self.getTablerate

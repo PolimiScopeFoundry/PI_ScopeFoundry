@@ -4,7 +4,7 @@ This version uses the pipython library, released by Physik Instrumente.
 ****************************************
 Calisesi Gianmaria (@Gianmaria92 on github), PhD at Politecnico di Milano.
 Michele Castriotta (@mikics on github), PhD at Politecnico di Milano.
-Andrea Bassi
+
 
 12/12/18
 """
