@@ -1,0 +1,4 @@
+2021-06-25T15:58:38|WARNING|root|no GCSTranslator path in Windows registry (HKLM\SOFTWARE\PI\GCSTranslator)
+2021-06-25T15:59:33|WARNING|root|no GCSTranslator path in Windows registry (HKLM\SOFTWARE\PI\GCSTranslator)
+2021-06-25T16:00:51|WARNING|root|no GCSTranslator path in Windows registry (HKLM\SOFTWARE\PI\GCSTranslator)
+2021-06-25T16:04:13|WARNING|root|no GCSTranslator path in Windows registry (HKLM\SOFTWARE\PI\GCSTranslator)

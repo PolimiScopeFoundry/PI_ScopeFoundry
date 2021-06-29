@@ -15,10 +15,11 @@ class PI_CG_HW(HardwareComponent):
     def setup(self):
         # create Settings (aka logged quantities)
         self.info = self.settings.New(name='info', dtype=str)
+        # self.name = self.settings.New(name='name stages', dtype=str)
         self.target_position = self.settings.New(name='target position', dtype=float, unit='mm')
-        self.position = self.settings.New(name='position', ro = True, dtype=float, unit='mm')
+        self.position = self.settings.New(name='position', ro = True, dtype=float, unit='mm', reread_from_hardware_after_write = True)
         
-        self.velocity = self.settings.New(name='velocity', dtype=float, unit='mm/s', initial = 0.5)
+        self.velocity = self.settings.New(name='velocity', dtype=float, unit='mm/s', initial = 0.5, reread_from_hardware_after_write = True)
         self.servo = self.settings.New(name='servo', initial=False, dtype=bool)
         self.home = self.settings.New(name='home', dtype=float, unit='mm')
         
