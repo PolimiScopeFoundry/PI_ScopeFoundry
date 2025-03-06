@@ -7,13 +7,26 @@ Created on Tue Jun 21 12:45:26 2021
 @authors: Victoire Destombes, Andrea Bassi. Politecnico di Milano
 """
 
-SERIAL = '0135500826' # serial number of the M-405 linear stage 
+# SERIAL = '0135500826' # serial number of the M-405 linear stage
 
 class PI_CG_HW(HardwareComponent):
     name = 'PI_CG_HW'
+
+    def __init__(self, *args, **kwargs ):
+        if 'serial' in kwargs:
+            _serial = kwargs['serial']
+            kwargs.pop('serial')
+            self._serial = _serial
+            super().__init__(*args, **kwargs)
+
+        else:
+            super().__init__(*args, **kwargs)
+            self._serial = '000000000000'
     
     def setup(self):
         # create Settings (aka logged quantities)
+        self.serial = self.settings.New(name='serial',dtype=str, initial = self._serial, ro=False)
+
         self.info = self.settings.New(name='info', dtype=str)
         # self.name = self.settings.New(name='name stages', dtype=str)
         self.target_position = self.settings.New(name='target position', dtype=float, unit='mm')
@@ -25,6 +38,8 @@ class PI_CG_HW(HardwareComponent):
         
         self.add_operation('SetHome', self.set_home)
         self.add_operation('GoHome', self.go_home)
+        self.step = self.settings.New(name='step', dtype=float, initial = 5, unit='um')
+        self.add_operation('Move', self.move_relative)
         self.add_operation('Stop', self.stop)
         self.add_operation('GotoRefSwitch', self.gotoRefSwitch)
         
@@ -44,12 +59,7 @@ class PI_CG_HW(HardwareComponent):
         self.servo.hardware_set_func = self.motor.set_servo        
         self.servo.hardware_read_func = self.motor.get_servo        
         
-        self.home.hardware_read_func = self.motor.get_home
-        
-        self.add_operation('SetHome', self.motor.set_home)
-        self.add_operation('GoHome', self.motor.go_home)
-        self.add_operation('Stop', self.motor.stop)
-        self.add_operation('GotoRefSwitch', self.motor.gotoRefSwitch)
+        # self.home.hardware_read_func = self.motor.get_home
         
         self.read_from_hardware()
         
@@ -70,6 +80,10 @@ class PI_CG_HW(HardwareComponent):
         
     def go_home(self):
         self.motor.go_home()
+
+    def move_relative(self):
+        self.motor.move_relative(self.step.value)
+        self.position.read_from_hardware()
         
     def gotoRefSwitch(self):
         self.motor.gotoRefSwitch()
