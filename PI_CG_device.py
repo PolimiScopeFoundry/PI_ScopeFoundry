@@ -1,30 +1,29 @@
 """
 ****************************************
 Created on Tue Jun 21 12:45:26 2021
-@authors: Victoire Destombes, Andrea Bassi. Politecnico di Milano
+@authors: Victoire Destombes, Andrea Bassi, Emma Martinelli. Politecnico di Milano
 
 """
 
-from PI_ScopeFoundry.PIPython.pipython import GCSDevice
+from pipython import GCSDevice, pitools
 import time
 from numpy import sign
+import warnings
 
 class PI_CG_Device(object):
     '''
-    Scopefoundry compatible class to run a FLIR camera with spinnaker software
-    For Pointgrey grasshopper, the bit depth is 16bit or 8bit, specified in the PixelFormat attribute, 
-    simple_pyspin is not compatible with 12bit readout. 
+    Scopefoundry compatible class to run Physics Instruments motors
     '''
     
-    VELOCITY = {'M-405.CG_VEL0.7MMS': 0.7, 
-              }
-    
-    
+    # VELOCITY = {'M-405.CG_VEL0.7MMS': 0.7,
+    #           }
+
     def __init__(self, serial = '0135500826', axis = '1'):
         self.serial = serial
         self.axis = axis
         self.pi_device = GCSDevice()                       
-        self.pi_device.ConnectUSB (serial) 
+        self.pi_device.ConnectUSB (serial)
+
         self.set_servo(mode = True)
         self.gotoRefSwitch()
         self.pi_device.RON(self.axis, True) 
@@ -52,18 +51,34 @@ class PI_CG_Device(object):
     def move_absolute(self, desired_pos, correct_backslash = False):
         rangemin = self.pi_device.qTMN()[self.axis]
         rangemax = self.pi_device.qTMX()[self.axis]
-        pos = min(rangemax, max(desired_pos, rangemin)) 
+        pos = min(rangemax, max(desired_pos, rangemin))
+        if desired_pos < rangemin:
+            warnings.warn(f"Displacement {pos} smaller than {rangemin}", UserWarning)
+        elif desired_pos > rangemax:
+            warnings.warn(f"Displacement {pos} bigger than {rangemax}", UserWarning)
         displacement = desired_pos - self.get_position()
         if correct_backslash:
             self.correct_backslash(displacement)
         self.pi_device.MOV(self.axis, pos)
         self.direction = sign(displacement)
         
-    def move_relative(self, displacement, correct_backslash = False):
+    def move_relative(self, desired_disp, correct_backslash = False):
+        disp = desired_disp * 0.001
+
+        rangemin = self.pi_device.qTMN()[self.axis]
+        rangemax = self.pi_device.qTMX()[self.axis]
+        pos = self.get_position() + disp
+        if pos < rangemin:
+            warnings.warn(f"Displacement {pos} smaller than {rangemin}", UserWarning)
+            disp = 0
+        elif pos > rangemax:
+            warnings.warn(f"Displacement {pos} bigger than {rangemax}", UserWarning)
+            disp = 0
+
         if correct_backslash:
-            self.correct_backslash(displacement)
-        self.pi_device.MVR(self.axis, displacement)
-        self.direction = sign(displacement)
+            self.correct_backslash(disp)
+        self.pi_device.MVR(self.axis, disp)
+        self.direction = sign(disp)
         
     def get_position(self):
         position = self.pi_device.qPOS(self.axis)[self.axis]    
@@ -118,7 +133,22 @@ class PI_CG_Device(object):
             
         velocity = min(vmax, max(desired_velocity, vmin)) 
         self.pi_device.VEL(self.axis, velocity)
-                
+
+    def trigger(self, trigger_step, trigger_stop):
+        for i in range(1, 4):
+            self.pi_device.TRO(i, 0)
+
+        # trigger output conditions configuration
+        self.pi_device.CTO(1, 2, 1)
+        self.pi_device.CTO(1, 3, 0)
+        self.pi_device.CTO(1, 1, trigger_step)
+        self.pi_device.CTO(4, 8, 0)
+        self.pi_device.CTO(4, 9, 0)
+
+        # enable the condition for trigger output
+        self.pi_device.TRO(1, 1)
+
+        self.pi_device.MOV(self.axis, trigger_stop)
         
     def close(self):
         #self.stop()
