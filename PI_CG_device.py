@@ -15,8 +15,8 @@ class PI_CG_Device(object):
     Scopefoundry compatible class to run Physics Instruments motors
     '''
     
-    # VELOCITY = {'M-405.CG_VEL0.7MMS': 0.7,
-    #           }
+    VELOCITY = {'M-405.CG_VEL0.7MMS': 0.7,
+              }
 
     def __init__(self, serial = '0135500826', axis = '1'):
         self.serial = serial
@@ -142,8 +142,8 @@ class PI_CG_Device(object):
         self.pi_device.CTO(1, 2, 1)
         self.pi_device.CTO(1, 3, 0)
         self.pi_device.CTO(1, 1, trigger_step)
-        self.pi_device.CTO(4, 8, 0)
-        self.pi_device.CTO(4, 9, 0)
+        self.pi_device.CTO(1, 8, 0)
+        self.pi_device.CTO(1, 9, 0)
 
         # enable the condition for trigger output
         self.pi_device.TRO(1, 1)
