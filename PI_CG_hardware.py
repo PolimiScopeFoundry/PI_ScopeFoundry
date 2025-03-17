@@ -1,5 +1,6 @@
 from ScopeFoundry import HardwareComponent
-from PI_ScopeFoundry.PI_CG_device import PI_CG_Device
+# from PI_ScopeFoundry_update.PI_CG_device import PI_CG_Device
+from PI_CG_device import PI_CG_Device
 
 # -*- coding: utf-8 -*-
 """
@@ -46,7 +47,7 @@ class PI_CG_HW(HardwareComponent):
         
     def connect(self):
         # connect settings to Device methods
-        self.motor = PI_CG_Device(serial = SERIAL, axis = '1')     
+        self.motor = PI_CG_Device(serial = self._serial, axis = '1')     #SERIAL
         
         self.info.hardware_read_func = self.motor.get_info
         
