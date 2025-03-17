@@ -1,7 +1,7 @@
 """
 ****************************************
 Created on Tue Jun 21 12:45:26 2021
-@authors: Victoire Destombes, Andrea Bassi. Politecnico di Milano
+@authors: Victoire Destombes, Andrea Bassi, Emma Martinelli. Politecnico di Milano
 
 """
 
@@ -17,11 +17,8 @@ class pi_cg_app(BaseMicroscopeApp):
         #Add hardware components
         print("Adding Hardware Components")
         from PI_CG_hardware import PI_CG_HW
-        self.add_hardware(PI_CG_HW(self))
-           
+        self.add_hardware(PI_CG_HW(self, serial='0115500028'))
 
-        self.ui.show()
-        self.ui.activateWindow()
 
 
 if __name__ == '__main__':

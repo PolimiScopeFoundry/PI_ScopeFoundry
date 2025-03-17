@@ -18,7 +18,7 @@ class PI_CG_Device(object):
     VELOCITY = {'M-405.CG_VEL0.7MMS': 0.7,
               }
 
-    def __init__(self, serial = '0135500826', axis = '1'):
+    def __init__(self, serial = '0000000000', axis = '1'):    #0135500826
         self.serial = serial
         self.axis = axis
         self.pi_device = GCSDevice()                       
