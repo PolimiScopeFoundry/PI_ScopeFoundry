@@ -1,4 +1,4 @@
-# from ScopeFoundry import HardwareComponent
+from ScopeFoundry import HardwareComponent
 from PI_ScopeFoundry_update.PI_CG_device import PI_CG_Device
 # from PI_CG_device import PI_CG_Device
 
