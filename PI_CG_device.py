@@ -14,9 +14,9 @@ class PI_CG_Device(object):
     '''
     Scopefoundry compatible class to run Physics Instruments motors
     '''
-    
-    VELOCITY = {'M-405.CG_VEL0.7MMS': 0.7,
-              }
+
+    VELOCITY = {'M-403.4DG': 2.5,
+                }
 
     def __init__(self, serial = '0000000000', axis = '1'):    #0135500826
         self.serial = serial
@@ -125,8 +125,8 @@ class PI_CG_Device(object):
         
     def set_velocity(self, desired_velocity):
         
-        vmin = 0.01
-        vmax = 15
+        vmin = 0.000001
+        vmax = 2.5
         
         if self.name in self.VELOCITY.keys():
             vmax = self.VELOCITY[self.name] 
@@ -149,10 +149,37 @@ class PI_CG_Device(object):
         self.pi_device.TRO(1, 1)
 
         self.pi_device.MOV(self.axis, trigger_stop)
+
+    def trigger_start(self, trigger_stop, trigger_start):
+        # self.pi_device.MOV(self.axis, trigger_start)
+        for i in range(1, 4):
+            self.pi_device.TRO(i, 0)
+
+        # trigger output conditions configuration
+        self.pi_device.CTO(1, 2, 1)
+        self.pi_device.CTO(1, 3, 0)
+        self.pi_device.CTO(1, 8, trigger_start)
+
+        # enable the condition for trigger output
+        self.pi_device.TRO(1, 1)
+
+        self.pi_device.MOV(self.axis, trigger_stop)
         
     def close(self):
         #self.stop()
         self.pi_device.close()
+
+        # trigger external start
+    def PI_velocity(self, t_exp, step):
+        vel = step / t_exp
+        print('velocity: ', vel)
+        if vel < 0.000001:
+            print('slow')
+            vel = 0.000001
+        if vel > 2.5:
+            print('too fast, use trigger ext')
+            vel = 2.5
+        return vel
         
         
 if __name__ == "__main__":
