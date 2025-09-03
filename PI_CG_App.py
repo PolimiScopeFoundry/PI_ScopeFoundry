@@ -17,6 +17,7 @@ class pi_cg_app(BaseMicroscopeApp):
         #Add hardware components
         print("Adding Hardware Components")
         from PI_CG_hardware import PI_CG_HW
+        # change the serial number with your device one
         self.add_hardware(PI_CG_HW(self, serial='0115500028'))
 
 

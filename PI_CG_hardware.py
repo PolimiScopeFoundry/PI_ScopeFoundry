@@ -1,14 +1,12 @@
 from ScopeFoundry import HardwareComponent
-from PI_ScopeFoundry.PI_CG_device import PI_CG_Device
-# from PI_CG_device import PI_CG_Device
+# from PI_ScopeFoundry.PI_CG_device import PI_CG_Device
+from PI_CG_device import PI_CG_Device
 
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jun 21 12:45:26 2021
 @authors: Victoire Destombes, Andrea Bassi. Politecnico di Milano
 """
-
-# SERIAL = '0135500826' # serial number of the M-405 linear stage
 
 class PI_CG_HW(HardwareComponent):
     name = 'PI_CG_HW'
@@ -35,7 +33,7 @@ class PI_CG_HW(HardwareComponent):
         
         self.velocity = self.settings.New(name='velocity', dtype=float, unit='mm/s', initial = 0.5, reread_from_hardware_after_write = True)
         self.servo = self.settings.New(name='servo', initial=False, dtype=bool)
-        self.home = self.settings.New(name='home', dtype=float, unit='mm')
+        self.home = self.settings.New(name='home', dtype=float, unit='mm', ro=True)
         
         self.add_operation('SetHome', self.set_home)
         self.add_operation('GoHome', self.go_home)
@@ -81,6 +79,8 @@ class PI_CG_HW(HardwareComponent):
         
     def go_home(self):
         self.motor.go_home()
+        self.motor.wait_on_target()
+        self.read_from_hardware()
 
     def move_relative(self):
         self.motor.move_relative(self.step.value)

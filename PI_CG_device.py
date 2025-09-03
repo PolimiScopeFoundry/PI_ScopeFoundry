@@ -14,8 +14,9 @@ class PI_CG_Device(object):
     '''
     Scopefoundry compatible class to run Physics Instruments motors
     '''
-
-    VELOCITY = {'M-403.4DG': 2.5,
+    # add your device and the maximum speed otherwise the maximum speed is set to 2.5
+    VELOCITY = {'M-403.4DG': 2.5,       # SPIM translator stage
+                'V-524.1AA': 250.0,     # voice coil
                 }
 
     def __init__(self, serial = '0000000000', axis = '1'):    #0135500826
@@ -81,6 +82,7 @@ class PI_CG_Device(object):
         self.direction = sign(disp)
         
     def get_position(self):
+        self.wait_on_target()
         position = self.pi_device.qPOS(self.axis)[self.axis]    
         return position
     
@@ -124,13 +126,12 @@ class PI_CG_Device(object):
         return vel
         
     def set_velocity(self, desired_velocity):
-        
         vmin = 0.000001
         vmax = 2.5
         
         if self.name in self.VELOCITY.keys():
             vmax = self.VELOCITY[self.name] 
-            
+
         velocity = min(vmax, max(desired_velocity, vmin)) 
         self.pi_device.VEL(self.axis, velocity)
 
