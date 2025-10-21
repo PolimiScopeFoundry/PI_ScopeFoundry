@@ -17,9 +17,10 @@ class PI_CG_Device(object):
     # add your device and the maximum speed otherwise the maximum speed is set to 2.5
     VELOCITY = {'M-403.4DG': 2.5,       # SPIM translator stage
                 'V-524.1AA': 250.0,     # voice coil
+                'L-402.10SD': 5.0,    # linear stage
                 }
 
-    def __init__(self, serial = '0000000000', axis = '1'):    #0135500826
+    def __init__(self, serial = '0000000000', axis = '1'):    
         self.serial = serial
         self.axis = axis
         self.pi_device = GCSDevice()                       
@@ -185,26 +186,20 @@ class PI_CG_Device(object):
         
 if __name__ == "__main__":
     
-    motor = PI_CG_Device()
+    # If you want to test the device class directly write here the serial number of your device
+    motor = PI_CG_Device('0185500006')
     try: 
-        
-        print('Position:', motor.get_position())
+
+        print('Device:', motor.pi_device.devname)
+        print('Initial position:', motor.get_position())
+        print('Velocity:', motor.get_velocity())
+        print('Mode:', motor.get_mode())
         motor.move_relative(0.5)
-        #motor.gotoRefSwitch()
-        # print('Home:', motor.get_home())
-        print('mode:', motor.get_mode())
-        
-        # motor.set_velocity(0.7)
-        
-        motor.stop()
-        #motor.move_relative(-0.1, True)
-        
-        #motor.wait_on_target()
-        #motor.gotoRefSwitch()
-        print('Position:', motor.get_position())
-        print(motor.pi_device.devname)
-        
-        # print('Position:', motor.get_position())
+        motor.wait_on_target()
+        print('Final position:', motor.get_position())
+        motor.move_absolute(2.0)
+        motor.wait_on_target()
+        print('Final position:', motor.get_position())
     
     finally:
         motor.close()
