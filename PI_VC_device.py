@@ -143,8 +143,7 @@ class PI_VC_Device(object):
         time.sleep(3)
         self.pi_device.DIO(1,0)
 
-    def trigger(self, trigger_step, trigger_start, trigger_stop):
-        correction = 0.1
+    def trigger(self, trigger_step, trigger_start, trigger_stop, correction):
         for i in range(1, 4):
             self.pi_device.TRO(i, 0)
 
@@ -152,8 +151,8 @@ class PI_VC_Device(object):
         self.pi_device.CTO(1, 2, 1)
         self.pi_device.CTO(1, 3, 0)
         self.pi_device.CTO(1, 1, trigger_step)
-        self.pi_device.CTO(1, 8, trigger_start - correction)
-        self.pi_device.CTO(1, 9, trigger_stop + correction)
+        self.pi_device.CTO(1, 8, trigger_start)
+        self.pi_device.CTO(1, 9, trigger_stop)
 
         # enable the condition for trigger output
         self.pi_device.TRO(1, 1)
@@ -200,15 +199,21 @@ if __name__ == "__main__":
     try:
 
         print('Device:', motor.pi_device.devname)
-        print('Initial position:', motor.get_position())
-        print('Velocity:', motor.get_velocity())
         print('Mode:', motor.get_mode())
-        motor.move_relative(0.5)
+        motor.set_velocity(1.0)
+        print('Velocity:', motor.get_velocity())
+        motor.move_absolute(1.5)
         motor.wait_on_target()
-        print('Final position:', motor.get_position())
-        motor.move_absolute(2.0)
+        print('Initial position for trigger:', motor.get_position())
+        motor.trigger(0.1, 2.0, 3.0)
         motor.wait_on_target()
-        print('Final position:', motor.get_position())
+        print('Final position after trigger:', motor.get_position())
+        # motor.move_absolute(4)
+        # motor.wait_on_target()
+        # print('Initial position for trigger:', motor.get_position())
+        # motor.trigger(0.1, 3.0, 2.0)
+        # motor.wait_on_target()
+        # print('Final position after trigger:', motor.get_position())
 
     finally:
         motor.close()
