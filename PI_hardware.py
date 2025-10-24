@@ -8,8 +8,8 @@ Created on Tue Jun 21 12:45:26 2021
 @authors: Victoire Destombes, Andrea Bassi. Politecnico di Milano
 """
 
-class PI_CG_HW(HardwareComponent):
-    name = 'PI_CG_HW'
+class PI_HW(HardwareComponent):
+    name = 'PI_HW'
 
     def __init__(self, *args, **kwargs ):
         if 'serial' in kwargs:
@@ -79,7 +79,6 @@ class PI_CG_HW(HardwareComponent):
         
     def go_home(self):
         self.motor.go_home()
-        self.motor.wait_on_target()
         self.read_from_hardware()
 
     def move_relative(self):
