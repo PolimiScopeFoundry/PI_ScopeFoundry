@@ -138,41 +138,50 @@ class PI_VC_Device(object):
         velocity = min(vmax, max(desired_velocity, vmin))
         self.pi_device.VEL(self.axis, velocity)
 
+    #this function should be used for C863 and C663 model in order to make the trigger function works
     def before_trigger(self):
         self.pi_device.DIO(1,1)
         time.sleep(3)
         self.pi_device.DIO(1,0)
 
     def trigger(self, trigger_step, trigger_start, trigger_stop, correction):
-        for i in range(1, 4):
+        ch = 4
+        ch_tot = 6
+
+        for i in range(1, ch_tot):
             self.pi_device.TRO(i, 0)
 
         # trigger output conditions configuration
-        self.pi_device.CTO(1, 2, 1)
-        self.pi_device.CTO(1, 3, 0)
-        self.pi_device.CTO(1, 1, trigger_step)
-        self.pi_device.CTO(1, 8, trigger_start)
-        self.pi_device.CTO(1, 9, trigger_stop)
+        self.pi_device.CTO(ch, 2, 1)
+        self.pi_device.CTO(ch, 3, 0)
+        self.pi_device.CTO(ch, 1, trigger_step)
+        self.pi_device.CTO(ch, 8, trigger_start)
+        self.pi_device.CTO(ch, 9, trigger_stop)
 
         # enable the condition for trigger output
-        self.pi_device.TRO(1, 1)
+        self.pi_device.TRO(ch, 1)
 
         self.pi_device.MOV(self.axis, trigger_stop + correction)
 
-    def trigger_start(self, trigger_stop, trigger_start):
+    def trigger_start(self, trigger_stop, trigger_start, correction):
+        ch = 4
+        ch_tot = 6
+
         # self.pi_device.MOV(self.axis, trigger_start)
-        for i in range(1, 4):
+        for i in range(1, ch_tot):
             self.pi_device.TRO(i, 0)
 
         # trigger output conditions configuration
-        self.pi_device.CTO(1, 2, 1)
-        self.pi_device.CTO(1, 3, 0)
-        self.pi_device.CTO(1, 8, trigger_start)
+        self.pi_device.CTO(ch, 2, 1)
+        self.pi_device.CTO(ch, 3, 0)
+        self.pi_device.CTO(ch, 1, 0.01)
+        self.pi_device.CTO(ch, 8, trigger_start)
+        self.pi_device.CTO(ch, 9, trigger_start+0.01)
 
         # enable the condition for trigger output
-        self.pi_device.TRO(1, 1)
+        self.pi_device.TRO(ch, 1)
 
-        self.pi_device.MOV(self.axis, trigger_stop)
+        self.pi_device.MOV(self.axis, trigger_stop + correction)
 
     def close(self):
         # self.stop()
