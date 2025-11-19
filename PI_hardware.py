@@ -1,5 +1,6 @@
 from ScopeFoundry import HardwareComponent
 # from PI_ScopeFoundry.PI_CG_device import PI_CG_Device
+from PI_VC_device import PI_VC_Device
 from PI_CG_device import PI_CG_Device
 
 # -*- coding: utf-8 -*-
@@ -11,16 +12,22 @@ Created on Tue Jun 21 12:45:26 2021
 class PI_HW(HardwareComponent):
     name = 'PI_HW'
 
-    def __init__(self, *args, **kwargs ):
+    def __init__(self, *args, **kwargs):
         if 'serial' in kwargs:
             _serial = kwargs['serial']
             kwargs.pop('serial')
             self._serial = _serial
-            super().__init__(*args, **kwargs)
-
         else:
-            super().__init__(*args, **kwargs)
             self._serial = '000000000000'
+
+        if 'encoder' in kwargs:
+            _encoder = kwargs['encoder']
+            kwargs.pop('encoder')
+            self._encoder = _encoder
+        else:
+            self._encoder = 'CG'
+
+        super().__init__(*args, **kwargs)
     
     def setup(self):
         # create Settings (aka logged quantities)
@@ -45,7 +52,10 @@ class PI_HW(HardwareComponent):
         
     def connect(self):
         # connect settings to Device methods
-        self.motor = PI_CG_Device(serial = self._serial, axis = '1')     #SERIAL
+        if self._encoder == 'VC':
+            self.motor = PI_VC_Device(serial = self._serial, axis = '1')
+        else:
+            self.motor = PI_CG_Device(serial = self._serial, axis = '1')
         
         self.info.hardware_read_func = self.motor.get_info
         
