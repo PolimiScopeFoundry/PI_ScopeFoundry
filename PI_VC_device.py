@@ -52,9 +52,9 @@ class PI_VC_Device(object):
         # print(f'Servo set to {mode}')
 
     def move_absolute(self, desired_pos, correct_backslash=False):
-        rel_pos = self.home + desired_pos
+        rel_pos = self.home + desired_pos 
         rangemin = self.pi_device.qTMN()[self.axis]
-        rangemax = self.pi_device.qTMX()[self.axis]
+        rangemax = self.pi_device.qTMX()[self.axis] 
         pos = min(rangemax, max(rel_pos, rangemin))
         if rel_pos < rangemin:
             warnings.warn(f"Displacement {pos} smaller than {rangemin}", UserWarning)
@@ -65,13 +65,16 @@ class PI_VC_Device(object):
             self.correct_backslash(displacement)
         self.pi_device.MOV(self.axis, pos)
         self.direction = sign(displacement)
+        # self.wait_on_target()
+        # print('real position: ', self.pi_device.qPOS(self.axis)[self.axis])
+        self.get_position
 
     def move_relative(self, desired_disp, correct_backslash=False):
         disp = desired_disp * 0.001
 
         rangemin = self.pi_device.qTMN()[self.axis]
         rangemax = self.pi_device.qTMX()[self.axis]
-        pos = self.get_position() + disp
+        pos = self.home + self.get_position() + disp
         if pos < rangemin:
             warnings.warn(f"Displacement {pos} smaller than {rangemin}", UserWarning)
             disp = 0
@@ -94,9 +97,9 @@ class PI_VC_Device(object):
         self.home = self.pi_device.qPOS(self.axis)[self.axis]
         print('home position: ', self.home)
 
-    def get_home(self):
-        home = self.pi_device.qDFH(self.axis)[self.axis]
-        return home
+    # def get_home(self):
+    #     home = self.pi_device.qDFH(self.axis)[self.axis]
+    #     return home
 
     def go_home(self):
         pitools.moveandwait(self.pi_device, self.axis, self.home)
