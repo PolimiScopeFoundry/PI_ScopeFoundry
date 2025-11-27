@@ -30,7 +30,7 @@ class PI_VC_Device(object):
         self.set_servo(mode=True)
         self.gotoRefSwitch()
         self.pi_device.RON(self.axis, True)
-        # self.set_home()    already done in the gotoRefSwitch
+        self.home = 0;    #already done in the gotoRefSwitch
         self.direction = 1  # to be used for backslash correction (sign of the direction, +1 or -1)
         self.name = self.pi_device.qCST()[axis]
 
@@ -90,12 +90,13 @@ class PI_VC_Device(object):
     def get_position(self):
         self.wait_on_target()
         position = self.pi_device.qPOS(self.axis)[self.axis] - self.home
-        print('real position: ', self.pi_device.qPOS(self.axis)[self.axis])
+        print('real position: ', f"{self.pi_device.qPOS(self.axis)[self.axis]:.6f}")
         return position
 
     def set_home(self):
         self.home = self.pi_device.qPOS(self.axis)[self.axis]
-        print('home position: ', self.home)
+        # print('home position: ', self.home)
+        print('home position:'f"{self.home:.6f}")
 
     # def get_home(self):
     #     home = self.pi_device.qDFH(self.axis)[self.axis]
@@ -110,7 +111,7 @@ class PI_VC_Device(object):
     def gotoRefSwitch(self):
         self.pi_device.FRF(self.axis)
         self.wait_on_target()
-        self.set_home()
+        #self.set_home()
 
     def wait_on_target(self):
         if not self.pi_device.qONT(self.axis)[self.axis]:
@@ -140,6 +141,7 @@ class PI_VC_Device(object):
 
         velocity = min(vmax, max(desired_velocity, vmin))
         self.pi_device.VEL(self.axis, velocity)
+    
 
     #this function should be used for C863 and C663 model in order to make the trigger function works
     def before_trigger(self):
@@ -147,12 +149,8 @@ class PI_VC_Device(object):
         time.sleep(3)
         self.pi_device.DIO(1,0)
 
-    def trigger(self, trigger_step, trigger_start, trigger_stop, correction):
-        ch = 4
-        ch_tot = 6
-
-        for i in range(1, ch_tot):
-            self.pi_device.TRO(i, 0)
+    def trigger(self, trigger_step, trigger_start, trigger_stop, ch, ch_tot):        
+        self.trigger_disable(ch_tot)
 
         # trigger output conditions configuration
         self.pi_device.CTO(ch, 2, 1)
@@ -164,27 +162,20 @@ class PI_VC_Device(object):
         # enable the condition for trigger output
         self.pi_device.TRO(ch, 1)
 
-        self.pi_device.MOV(self.axis, trigger_stop + correction)
-
-    def trigger_start(self, trigger_stop, trigger_start, correction):
-        ch = 4
-        ch_tot = 6
-
-        # self.pi_device.MOV(self.axis, trigger_start)
-        for i in range(1, ch_tot):
-            self.pi_device.TRO(i, 0)
+    def trigger_start(self, trigger_start, ch, ch_tot):
+        self.trigger_disable(ch_tot)
 
         # trigger output conditions configuration
         self.pi_device.CTO(ch, 2, 1)
         self.pi_device.CTO(ch, 3, 0)
-        self.pi_device.CTO(ch, 1, 0.01)
         self.pi_device.CTO(ch, 8, trigger_start)
-        self.pi_device.CTO(ch, 9, trigger_start+0.01)
 
         # enable the condition for trigger output
         self.pi_device.TRO(ch, 1)
 
-        self.pi_device.MOV(self.axis, trigger_stop + correction)
+    def trigger_disable(self, ch_tot):
+        for i in range(1, ch_tot):
+            self.pi_device.TRO(i, 0)
 
     def close(self):
         # self.stop()

@@ -17,7 +17,7 @@ class pi_app(BaseMicroscopeApp):
         from PI_hardware import PI_HW
         # change the serial number with your device one and the encoder you want to use
         #translator stage
-        self.add_hardware(PI_HW(self, serial='0115500028', encoder='CG'))
+        self.add_hardware(PI_HW(self, serial='0185500006', encoder='VC'))
         #voice coil
         # self.add_hardware(PI_HW(self, serial='0119024343', encoder='VC'))
 

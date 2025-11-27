@@ -142,37 +142,33 @@ class PI_CG_Device(object):
         time.sleep(3)
         self.pi_device.DIO(1, 0)
 
-    def trigger(self, trigger_step, trigger_start, trigger_stop):
-        correction = 0.1
-        for i in range(1, 4):
-            self.pi_device.TRO(i, 0)
+    def trigger(self, trigger_step, trigger_start, trigger_stop, ch, ch_tot):
+        self.trigger_disable(ch_tot)
 
-        # trigger output conditions configuration
-        self.pi_device.CTO(1, 2, 1)
-        self.pi_device.CTO(1, 3, 0)
-        self.pi_device.CTO(1, 1, trigger_step)
-        self.pi_device.CTO(1, 8, trigger_start)
-        self.pi_device.CTO(1, 9, trigger_stop)
+        # trigger output conditions configuration (for channel 1)
+        self.pi_device.CTO(ch, 2, 1)
+        self.pi_device.CTO(ch, 3, 0)
+        self.pi_device.CTO(ch, 1, trigger_step)
+        self.pi_device.CTO(ch, 8, trigger_start)
+        self.pi_device.CTO(ch, 9, trigger_stop)
 
         # enable the condition for trigger output
-        self.pi_device.TRO(1, 1)
+        self.pi_device.TRO(ch, 1)
 
-        self.pi_device.MOV(self.axis, trigger_stop + correction)
-
-    def trigger_start(self, trigger_stop, trigger_start):
-        # self.pi_device.MOV(self.axis, trigger_start)
-        for i in range(1, 4):
-            self.pi_device.TRO(i, 0)
+    def trigger_start(self, trigger_start, ch, ch_tot):
+        self.trigger_disable(ch_tot)
 
         # trigger output conditions configuration
-        self.pi_device.CTO(1, 2, 1)
-        self.pi_device.CTO(1, 3, 0)
-        self.pi_device.CTO(1, 8, trigger_start)
+        self.pi_device.CTO(ch, 2, 1)
+        self.pi_device.CTO(ch, 3, 0)
+        self.pi_device.CTO(ch, 8, trigger_start)
 
         # enable the condition for trigger output
-        self.pi_device.TRO(1, 1)
+        self.pi_device.TRO(ch, 1)
 
-        self.pi_device.MOV(self.axis, trigger_stop)
+    def trigger_disable(self, ch_tot):
+        for i in range(1, ch_tot):
+            self.pi_device.TRO(i, 0)
         
     def close(self):
         #self.stop()

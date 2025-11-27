@@ -59,8 +59,8 @@ class PI_HW(HardwareComponent):
         
         self.info.hardware_read_func = self.motor.get_info
         
-        self.position.hardware_read_func = self.motor.get_position
         self.target_position.hardware_set_func = self.motor.move_absolute
+        self.position.hardware_read_func = self.motor.get_position
         
         self.velocity.hardware_read_func = self.motor.get_velocity
         self.velocity.hardware_set_func = self.motor.set_velocity
@@ -97,7 +97,6 @@ class PI_HW(HardwareComponent):
         
     def gotoRefSwitch(self):
         self.motor.gotoRefSwitch()
-        
-        
+          
         
         
