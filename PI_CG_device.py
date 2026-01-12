@@ -110,8 +110,8 @@ class PI_CG_Device(object):
         if not self.pi_device.qONT(self.axis)[self.axis]:
             time.sleep(0.05)
             self.wait_on_target()
-        else:
-            print('On target')
+        # else:
+        #     print('On target')
         
     
     def correct_backslash(self, displacement):
@@ -157,6 +157,7 @@ class PI_CG_Device(object):
 
     def trigger_start(self, trigger_start, ch, ch_tot):
         self.trigger_disable(ch_tot)
+        self.before_trigger()   
 
         # trigger output conditions configuration
         self.pi_device.CTO(ch, 2, 1)
@@ -190,18 +191,21 @@ class PI_CG_Device(object):
 if __name__ == "__main__":
     
     # If you want to test the device class directly write here the serial number of your device
-    motor = PI_CG_Device('0185500006')
+    motor = PI_CG_Device('0024550348')
     try: 
 
 
         print('Device:', motor.pi_device.devname)
         print('Mode:', motor.get_mode())
-        motor.set_velocity(1.0)
+        motor.set_velocity(5.0)
         print('Velocity:', motor.get_velocity())
         motor.move_absolute(1.5)
         motor.wait_on_target()
         print('Initial position for trigger:', motor.get_position())
-        motor.trigger(0.1, 2.0, 3.0)
+
+        motor.trigger(0.1, 2.0, 10.0, 1, 4)
+        
+        motor.move_absolute(10.50)
         motor.wait_on_target()
         print('Final position after trigger:', motor.get_position())
         # motor.move_absolute(4)
@@ -210,7 +214,7 @@ if __name__ == "__main__":
         # motor.trigger(0.1, 3.0, 2.0)
         # motor.wait_on_target()
         # print('Final position after trigger:', motor.get_position())
-
+        motor.set_velocity(5.0)
     
     finally:
         motor.close()
