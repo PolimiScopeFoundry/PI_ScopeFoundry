@@ -134,14 +134,14 @@ class PI_VC_Device(object):
 
     def set_velocity(self, desired_velocity):
         vmin = 0.000001
-        vmax = 2.5
 
         if self.name in self.VELOCITY.keys():
             vmax = self.VELOCITY[self.name]
+        else:
+            vmax = 2.5
 
         velocity = min(vmax, max(desired_velocity, vmin))
         self.pi_device.VEL(self.axis, velocity)
-    
 
     #this function should be used for C863 and C663 model in order to make the trigger function works
     def before_trigger(self):
@@ -149,6 +149,7 @@ class PI_VC_Device(object):
         time.sleep(3)
         self.pi_device.DIO(1,0)
 
+    '''given a start and stop position there will be a trigger every step'''
     def trigger(self, trigger_step, trigger_start, trigger_stop, ch, ch_tot):        
         self.trigger_disable(ch_tot)
 
@@ -162,13 +163,15 @@ class PI_VC_Device(object):
         # enable the condition for trigger output
         self.pi_device.TRO(ch, 1)
 
-    def trigger_start(self, trigger_start, ch, ch_tot):
+    '''given a start position and an end position le trigger will remain high between these two value'''
+    def trigger_start(self, trigger_start, trigger_stop, ch, ch_tot):
         self.trigger_disable(ch_tot)
 
         # trigger output conditions configuration
         self.pi_device.CTO(ch, 2, 1)
-        self.pi_device.CTO(ch, 3, 0)
-        self.pi_device.CTO(ch, 8, trigger_start)
+        self.pi_device.CTO(ch, 3, 3)
+        self.pi_device.CTO(ch, 5, trigger_start)
+        self.pi_device.CTO(ch, 6, trigger_stop)
 
         # enable the condition for trigger output
         self.pi_device.TRO(ch, 1)
@@ -180,19 +183,6 @@ class PI_VC_Device(object):
     def close(self):
         # self.stop()
         self.pi_device.close()
-
-        # trigger external start
-
-    def PI_velocity(self, t_exp, step):
-        vel = step / t_exp
-        print('velocity: ', vel)
-        if vel < 0.000001:
-            print('slow')
-            vel = 0.000001
-        if vel > 2.5:
-            print('too fast, use trigger ext')
-            vel = 2.5
-        return vel
 
 
 if __name__ == "__main__":
